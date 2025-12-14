@@ -1,6 +1,6 @@
 # Account LockerRoom
 
-**Version:** 2.1  
+**Version:** 2.0  
 **Release Date:** December 15, 2025  
 **Copyright © 2025 Websynth. All rights reserved.**
 
