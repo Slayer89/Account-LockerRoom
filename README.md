@@ -1,145 +1,122 @@
 # Account LockerRoom
 
-**Version:** 2.0  
-**Release Date:** December 15, 2025  
-**Copyright © 2025 Websynth. All rights reserved.**
+![Windows](https://img.shields.io/badge/platform-Windows-0078D6)
+![.NET](https://img.shields.io/badge/.NET-8-512BD4)
+![UI](https://img.shields.io/badge/UI-WPF-0B5CAD)
+![License](https://img.shields.io/badge/license-Proprietary-important)
 
----
+**Version:** 2.2.0
 
-## Overview
+Account LockerRoom is a Windows desktop password manager (WPF on .NET 8) with an optional browser extension + native host bridge for autofill and credential capture.
 
-**Account LockerRoom** is a comprehensive, enterprise-grade password management solution designed for Windows. Built with security and usability in mind, it provides a secure vault for storing, managing, and organizing your credentials, passwords, and sensitive information.
+- [What’s in this repo](#whats-in-this-repo)
+- [Screenshots](#screenshots)
+- [Key features (verified)](#key-features-verified)
+- [Architecture](#architecture)
+- [Data locations](#data-locations)
+- [System requirements](#system-requirements)
+- [License](#license)
+- [Disclaimer](#disclaimer)
 
-Account LockerRoom offers advanced encryption, multi-factor authentication, and a modern user interface to ensure your digital credentials remain safe while providing an intuitive user experience.
+## What’s in this repo
 
----
+| Component | Purpose | Location |
+|---|---|---|
+| Desktop app | Main WPF application | `Account LockerRoom/Presentation/AccountLockerRoom.csproj` |
+| Core layers | Domain + application services + infrastructure + shared utilities | `Account LockerRoom/Core`, `Account LockerRoom/Application`, `Account LockerRoom/Infrastructure`, `Account LockerRoom/Shared` |
+| Updater | Separate updater executable (must sit next to the app EXE) | `Updater/Updater.csproj` |
+| Browser extension | MV3 extension for pairing/autofill/capture | `BrowserExtension/AccountLockerRoom.Extension/` |
+| Native host (optional) | Native Messaging host / bridge for the extension | `NativeHost/AccountLockerRoom.NativeHost/` |
 
-## Features
+## Screenshots
 
-### 🔐 Security Features
+| Main program | Security audit |
+|---|---|
+| ![MainProgram](Assets/Docs/Screenshots/MainProgram.png) | ![SecurityAudit](Assets/Docs/Screenshots/SecurityAudit.png) |
 
-- **Credential Encryption** - All credentials are encrypted using industry-standard encryption algorithms
-- **Two-Factor Authentication (2FA)** - TOTP-based two-factor authentication for enhanced security
-- **Auto-Lock** - Automatic application locking after user-defined inactivity period
-- **Stealth Mode** - Instantly hide the application with a hotkey for privacy protection
-- **Clipboard Security** - Automatic clipboard clearing after copying sensitive information
-- **Virtual Keyboard** - Secure password entry using on-screen virtual keyboard
-- **Security Audit** - Comprehensive password strength analysis and security recommendations
-- **Secure Notes** - Store encrypted or unencrypted notes alongside your credentials
+| Quick login | Notes manager (create note) |
+|---|---|
+| ![QuickLogin](Assets/Docs/Screenshots/QuickLogin.png) | ![NotesManager_CreateNote](Assets/Docs/Screenshots/NotesManager_CreateNote.png) |
 
-### 💾 Credential Management
+## Key features (verified)
 
-- **Secure Storage** - Store usernames, passwords, emails, and notes in an encrypted SQLite database
-- **Category System** - Organize credentials with customizable categories and filters
-- **Search Functionality** - Quick search across all credential fields
-- **View Modes** - Multiple viewing options (list, compact, detailed)
-- **Import/Export** - Backup and restore capabilities with CSV and Excel support
-- **Encrypted Backups** - Create encrypted backup files for disaster recovery
+### Vault + data
 
-### 🎨 User Interface
+- **SQLite-backed vault** with encrypted credential fields.
+- **Local app-data storage** under `%APPDATA%\Account_Lockerroom\` (vault database, notes folder, station list, UI preferences, logs).
 
-- **Theme System** - 7 built-in professional themes plus custom color themes
-- **Modern Menu Design** - Redesigned menu system with keyboard shortcuts
-- **High-DPI Support** - Optimized for high-resolution displays
-- **Enhanced Forms** - Professional layouts and styling throughout the application
+### Security
 
-### 🛠️ Built-in Tools
+- **Credential encryption** with key-derivation and envelope-style key management (Argon2id-based derivation is used in the key-management path).
+- **Two-factor authentication (TOTP)** with QR provisioning and **recovery codes**.
+- **Clipboard auto-clear** after copying sensitive fields.
+- **Stealth mode**: global hotkey hides the app and requires unlock to return.
+- **Virtual keyboard** for password/text entry.
+- **Security audit** UI (weak and duplicate password detection; “old passwords” is currently a placeholder).
 
-- **Password Generator** - Generate strong, secure passwords with customizable criteria
-- **Password Strength Evaluator** - Real-time password strength assessment
-- **Calculator** - Quick access calculator tool
-- **Radio Player** - Built-in radio player with Greek radio station support
-- **Station Manager** - Manage radio stations via JSON configuration
-- **Notes System** - Create and manage encrypted or unencrypted notes
+### Password UX
 
-### 📋 Additional Features
+- **Password generator** and **password strength evaluation** used in registration and note protection flows.
 
-- **Changelog Viewer** - Access complete version history from within the application
-- **Update System** - Automatic update checking and notification system
-- **Comprehensive Logging** - Detailed logging system for troubleshooting and auditing
-- **Keyboard Shortcuts** - Extensive keyboard shortcut support for power users
-- **User Preferences** - Customizable application settings and preferences
+### Notes
 
----
+- **Personal and account notes** stored on disk under the app data folder.
+- **Optional password-protected notes** (BCrypt verification + encrypted content with per-note salt).
 
-## Technical Specifications
+### Tools
 
-- **Platform:** Windows (Desktop Application)
-- **Framework:** .NET Framework 4.8
-- **UI Technology:** Windows Forms (WinForms)
-- **Database:** SQLite
-- **Architecture:** Layered Architecture (Presentation, Application, Core, Infrastructure)
+- **Calculator** tool window.
+- **Radio player + station manager**: stations are persisted to `%APPDATA%\Account_Lockerroom\stations.json` and can be merged with an online list.
 
----
+### Backup, import/export
 
-## System Requirements
+- **Encrypted backup/export and restore** of the vault database.
+- **Credential import** from CSV/Excel (with header validation) and related backup UI.
 
-- **Operating System:** Windows 7 or later
-- **.NET Framework:** Version 4.8 or later
-- **Memory:** Minimum 2GB RAM
-- **Storage:** 50MB free disk space
-- **Display:** Minimum 1024x768 resolution (High-DPI supported)
+### Updates
 
----
+- **Update manifest** model with size + SHA-256 validation.
+- The desktop app can stage an update package and **launch `Updater.exe`** (must be adjacent to the desktop app executable).
 
-## Getting Started
+### Browser integration (optional)
 
-1. **Installation** - Download and run the Account LockerRoom installer
-2. **First Launch** - Create your master account with a secure password
-3. **Add Credentials** - Start adding your credentials, organizing them into categories
-4. **Explore Features** - Discover the various tools and security features available
-5. **Customize** - Adjust themes, preferences, and security settings to your liking
+The browser extension pairs with the desktop app and can request credentials for autofill and send captured credentials back for review.
 
----
+See: `BrowserExtension/AccountLockerRoom.Extension/README.md`
 
-## Security Best Practices
+## Architecture
 
-- **Strong Master Password** - Use a unique, strong master password that you can remember
-- **Enable 2FA** - Activate two-factor authentication for additional security
-- **Regular Backups** - Create encrypted backups of your vault regularly
-- **Auto-Lock** - Configure auto-lock to protect your data when away
-- **Security Audit** - Regularly review the security audit report and update weak passwords
+![Architecture diagram](Assets/Docs/Architecture/architecture.svg)
 
----
+<!-- Diagram source (Mermaid) is maintained in Assets/Docs/Architecture/architecture.mmd -->
 
-## Version History
+## Data locations
 
-For detailed version history and changelog, see:
-- **In-App:** Help → Changelog
-- **GitHub:** See `updates/CHANGELOG.md` file
+Account LockerRoom stores user data under:
 
-**Current Version:** 2.1 (December 15, 2025)
+- `%APPDATA%\Account_Lockerroom\`
+- Example: `C:\Users\<you>\AppData\Roaming\Account_Lockerroom\`
 
----
+Common files/folders you may see there:
 
-## Support & Documentation
+| Name | Purpose |
+|---|---|
+| `vaults.json` | Vault list |
+| `ui_preferences.json` | UI settings |
+| `stations.json` | Radio stations |
+| `Notes\` | Personal and account notes |
+| `Logs\` | Structured logs |
 
-- **Changelog:** Access from Help → Changelog menu
-- **About:** View application information from Help → About
-- **Update Check:** Help → Check for Updates
+## System requirements
 
----
+- Windows 10+ recommended
+- .NET 8 Desktop Runtime (for the WPF desktop app)
+- .NET Framework 4.8 (for `Updater.exe`)
 
-## License & Copyright
+## License
 
-**Account LockerRoom** is proprietary software owned by **Websynth**.
-
-© 2025 Websynth. All rights reserved.
-
-This software is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties. Unauthorized reproduction or distribution of this software, or any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.
-
----
+This repository contains proprietary software owned by Websynth. All rights reserved.
 
 ## Disclaimer
 
-This software is provided "as is" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability and fitness for a particular purpose. The user assumes all risks associated with the use of this software.
-
----
-
-## Special Thanks
-
-Special credits to **Linn_K** for creating the beautiful visuals and design elements that make this application visually appealing.
-
----
-
-**For inquiries or support, please contact Websynth.**
+Account LockerRoom is provided “as is”, without warranty of any kind, express or implied.
